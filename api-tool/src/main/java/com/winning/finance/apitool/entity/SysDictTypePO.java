@@ -62,7 +62,7 @@ public class SysDictTypePO {
      * 说明
      */
     @Basic
-    @Column(name = "explain")
-    private String explain;
+    @Column(name = "memo")
+    private String memo;
 
 }

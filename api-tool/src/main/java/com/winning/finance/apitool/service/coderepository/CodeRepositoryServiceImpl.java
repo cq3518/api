@@ -110,8 +110,8 @@ public class CodeRepositoryServiceImpl implements CodeRepositoryService {
         if(StrUtil.isBlank(inputVO.getInterfaceBasePath())){
             po.setInterfaceBasePath(oldPO.getInterfaceBasePath());
         }
-        if(StrUtil.isBlank(inputVO.getExplain())){
-            po.setExplain(oldPO.getExplain());
+        if(StrUtil.isBlank(inputVO.getMemo())){
+            po.setMemo(oldPO.getMemo());
         }
         codeRepository.save(po);
         return editOutVO;

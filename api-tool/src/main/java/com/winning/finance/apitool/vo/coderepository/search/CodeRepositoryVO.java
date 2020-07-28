@@ -85,7 +85,7 @@ public class CodeRepositoryVO {
     /**
      * 说明
      */
-    private String explain;
+    private String memo;
 
     /**
      * 当前API编号

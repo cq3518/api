@@ -72,7 +72,7 @@ public class CodeRepositoryInformationPO {
      * 异常类别编码
      */
     @Basic
-    @Column(name = "exception_class_no")
+    @Column(name = "EXCEPTION_CLASS_NO")
     private BigInteger exceptionClassNo;
 
     /**
@@ -121,8 +121,8 @@ public class CodeRepositoryInformationPO {
      * 说明
      */
     @Basic
-    @Column(name = "EXPLAIN")
-    private String explain;
+    @Column(name = "MEMO")
+    private String memo;
 
     /**
      * 当前API编号

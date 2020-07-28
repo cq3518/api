@@ -58,7 +58,7 @@ public class AddInputVO {
     private String createBy;
 
     @ApiModelProperty(value = "说明",position = 110)
-    private String explain;
+    private String memo;
 
     @ApiModelProperty(value = "当前API编号",required = true,position = 120)
     @NotBlank(message = "当前API编号不能空")

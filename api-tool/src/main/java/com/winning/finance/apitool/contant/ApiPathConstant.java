@@ -33,4 +33,25 @@ public class ApiPathConstant {
      *  根据字典主键查询字典数据信息列表
      */
     public  static final String SYS_DICT_DATA_BY_SYS_DICT_ID="/sysDictData/dictDataById";
+    /**
+     *   新增分组信息
+     */
+    public  static final String CODE_REPOSITORY_GROUP_ADD="/codeRepositoryGroup/add";
+
+    /**
+     *   修改分组信息
+     */
+    public  static final String CODE_REPOSITORY_GROUP_EDIT="/codeRepositoryGroup/edit";
+
+    /**
+     *   删除分组信息
+     */
+    public  static final String CODE_REPOSITORY_GROUP_DELETE="/codeRepositoryGroup/delete";
+
+    /**
+     *    根据代码仓库标识查询分组信息
+     */
+    public  static final String CODE_REPOSITORY_GROUP_SEARCH="/codeRepositoryGroup/search";
+
+
 }

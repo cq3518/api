@@ -59,7 +59,7 @@ public class EditInputVO {
 
 
     @ApiModelProperty(value = "说明",position = 100)
-    private String explain;
+    private String memo;
 
     @ApiModelProperty(value = "当前API编号",required = true,position = 110)
     @NotBlank(message = "当前API编号不能空")
