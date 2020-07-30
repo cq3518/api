@@ -1,4 +1,4 @@
-package com.winning.finance.apitool.vo.apiinfo.hangup;
+package com.winning.finance.apitool.vo.apiinfo.search;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -6,22 +6,23 @@ import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.Date;
 import java.util.List;
 
 /**
  * <p>api-tool</p>
- * 新建挂起api信息
+ * 根据签出API标识查询签出的API信息
  * @author cq
  * @Description
- * @date 2020/7/29 10:11
+ * @date 2020/7/30 14:21
  */
 @Data
-@ApiModel(value = "NewHangUpInputVO", description = "新建挂起api信息入参")
-public class NewHangUpInputVO {
+@ApiModel(value = "ApiInfoByApiUpdateIdOutVO",description = "根据签出API标识查询签出的API信息出参")
+public class ApiInfoByApiUpdateIdOutVO {
 
-    @NotNull(message = "分组标识分组标识不为空")
-    @ApiModelProperty(value = "分组标识",required = true,position = 10)
-    private Long groupId;
+    @NotNull(message = "API标识不为空")
+    @ApiModelProperty(value = "API标识",required = true,position = 10)
+    private Long apiId;
 
     @NotBlank(message = "API名称不为空")
     @ApiModelProperty(value = "API名称",required = true,position = 20)
@@ -59,12 +60,22 @@ public class NewHangUpInputVO {
     @ApiModelProperty(value = "创建人",position = 90)
     private String createBy;
 
+    @ApiModelProperty(value = "创建时间",required = true,position = 91)
+    private Date createAt;
+
+    @ApiModelProperty(value = "最后更新时间",required = true,position = 92)
+    private String modifiedAt;
+
     @ApiModelProperty(value = "说明",position = 100)
     private String memo;
 
+    @ApiModelProperty(value = "挂起状态代码",position = 101)
+    private Long hangUpStatusCode;
+
+
     @ApiModelProperty(value = "API的入参列表",position = 110)
-    private List<ParameterVO> inputParameterList;
+    private List<ApiParameter> inputParameterList;
 
     @ApiModelProperty(value = "API的出参列表",position = 120)
-    private List<ParameterVO> OutputParameterList;
+    private List<ApiParameter> OutputParameterList;
 }

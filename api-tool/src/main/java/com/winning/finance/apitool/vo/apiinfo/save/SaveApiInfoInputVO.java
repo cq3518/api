@@ -10,13 +10,13 @@ import java.util.List;
 
 /**
  * <p>api-tool</p>
- *
+ *提交挂起的API修改
  * @author cq
  * @Description
  * @date 2020/7/29 16:27
  */
 @Data
-@ApiModel(value = "SaveApiInfoInputVO",description = "")
+@ApiModel(value = "SaveApiInfoInputVO",description = "提交挂起的API修改")
 public class SaveApiInfoInputVO {
 
     @NotEmpty(message = "API修改标识列表不为空")

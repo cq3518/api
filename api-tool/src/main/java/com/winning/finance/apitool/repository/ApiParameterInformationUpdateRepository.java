@@ -1,5 +1,6 @@
 package com.winning.finance.apitool.repository;
 
+import com.winning.finance.apitool.entity.ApiInformationDetailPO;
 import com.winning.finance.apitool.entity.ApiParameterInformationUpdatePO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -35,4 +36,5 @@ public interface ApiParameterInformationUpdateRepository extends JpaRepository<A
      */
     @Query("select  po from ApiParameterInformationUpdatePO po where po.apiUpdateId in (?1)")
     List<ApiParameterInformationUpdatePO> listByApiUpdateId(List<Long> apiUpdateId);
+
 }

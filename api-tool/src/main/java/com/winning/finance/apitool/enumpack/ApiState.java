@@ -7,33 +7,33 @@ import java.util.Objects;
 
 /**
  * <p>api-tool</p>
- * 挂起状态代码
+ *
  * @author cq
  * @Description
- * @date 2020/7/29 12:50
+ * @date 2020/7/30 13:18
  */
 @Getter
-public enum HangUpStatus {
+public enum  ApiState {
 
-    NEW(24L, "新建中"),
-    CHECKING_OUT(25L, "签出中"),
-    CHECKING_IN(26L,  "已签入"),
-    RESCINDED(27L,  "已撤销");
+    TO_BE_DEVELOPED(14L, "待开发"),
+    IN_DEVELOPMENT(15L, "开发中"),
+    COMPLETED(16L,  "已完成"),
+    OBSOLETE(17L,  "已废弃");
 
 
     private Long code;
     private String name;
 
-    HangUpStatus(Long code, String name) {
+    ApiState(Long code, String name) {
         this.code = code;
         this.name = name;
     }
-    public static HangUpStatus getInstance(Long code){
-        for(HangUpStatus temp : HangUpStatus.values()){
+    public static ApiState getInstance(Long code){
+        for(ApiState temp : ApiState.values()){
             if(Objects.equals(code,temp.getCode())){
                 return temp;
             }
         }
-        throw new BusinessException(":找不到对应的挂起状态代码" );
+        throw new BusinessException(":找不到对应的api状态代码" );
     }
 }

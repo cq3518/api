@@ -34,8 +34,8 @@ public interface CodeRepositoryInformationRepository extends JpaRepository<CodeR
      * @param apiNo 当前api的数量
      * @return 当前api的数量
      */
-    @Query("select  count(1) from CodeRepositoryInformationPO where currApiNo =?1 ")
-    Integer countByApiNo(String apiNo);
+    @Query("select  count(1) from CodeRepositoryInformationPO where currApiNo =?1 and codeRepositoryId <> ?2")
+    Integer countByApiNo(String apiNo,Long codeRepositoryId);
 
     /**
      * 获取代码仓库信息

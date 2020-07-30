@@ -95,7 +95,7 @@ public class CodeRepositoryServiceImpl implements CodeRepositoryService {
         EditOutVO editOutVO=new EditOutVO();
         editOutVO.setCodeRepositoryId(inputVO.getCodeRepositoryId());
         //当api编号存在时 抛出错误信息
-        checkApiNo(inputVO.getCurrApiNo());
+        checkApiNo(inputVO.getCurrApiNo(),inputVO.getCodeRepositoryId());
         // 修改
         CodeRepositoryInformationPO oldPO=  getPO(inputVO);
         CodeRepositoryInformationPO po=new CodeRepositoryInformationPO();
@@ -126,9 +126,9 @@ public class CodeRepositoryServiceImpl implements CodeRepositoryService {
         }
     }
 
-    private void checkApiNo(String apiNo){
+    private void checkApiNo(String apiNo,Long codeRepositoryId){
 
-        int count=codeRepository.countByApiNo(apiNo);
+        int count=codeRepository.countByApiNo(apiNo,codeRepositoryId);
         if(count>0){
             throw  new BusinessException("已存在【api编号】："+apiNo);
         }

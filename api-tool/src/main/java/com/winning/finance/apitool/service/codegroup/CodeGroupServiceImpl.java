@@ -6,7 +6,11 @@ import com.google.common.base.MoreObjects;
 import com.google.common.collect.Lists;
 import com.winning.finance.apitool.base.BusinessException;
 import com.winning.finance.apitool.contant.Constant;
+import com.winning.finance.apitool.entity.ApiInformationDetailPO;
+import com.winning.finance.apitool.entity.ApiInformationDetailUpdatePO;
 import com.winning.finance.apitool.entity.CodeRepositoryGroupPO;
+import com.winning.finance.apitool.repository.ApiInformationDetailRepository;
+import com.winning.finance.apitool.repository.ApiInformationDetailUpdateRepository;
 import com.winning.finance.apitool.repository.CodeRepositoryGroupRepository;
 import com.winning.finance.apitool.vo.coderepositorygroup.add.AddGroupInputVO;
 import com.winning.finance.apitool.vo.coderepositorygroup.add.AddGroupOutVO;
@@ -42,6 +46,10 @@ public class CodeGroupServiceImpl implements CodeGroupService {
     @Autowired
     private GroupInfoUtil groupInfoUtil;
 
+    @Autowired
+    private ApiInformationDetailUpdateRepository apiInformationDetailUpdateRepository;
+    @Autowired
+    private ApiInformationDetailRepository apiInformationDetailRepository;
     @Override
     public AddGroupOutVO add(AddGroupInputVO inputVO) {
         checkByParentGroupId(inputVO);
@@ -103,7 +111,15 @@ public class CodeGroupServiceImpl implements CodeGroupService {
     @Override
     public void delete(DeleteGroupInputVO inputVO) {
 
-        // todo 如果分组下包含API接口信息，则不允许删除
+        //  如果分组下包含API接口信息，则不允许删除
+        List<ApiInformationDetailPO> apiInformationDetailPOS= apiInformationDetailRepository.listByGroupId(Lists.newArrayList(inputVO.getGroupId()),Constant.IS_DEL_YES);
+        if(CollectionUtil.isNotEmpty(apiInformationDetailPOS)){
+            throw  new BusinessException("如果分组下包含API接口信息，不允许删除！");
+        }
+        List<ApiInformationDetailUpdatePO> updatePOS= apiInformationDetailUpdateRepository.listByGroupId(Lists.newArrayList(inputVO.getGroupId()),Constant.IS_DEL_YES);
+        if(CollectionUtil.isNotEmpty(updatePOS)){
+            throw  new BusinessException("如果分组下包含API接口信息，不允许删除！");
+        }
         codeRepositoryGroupRepository.deleteByGroupId(inputVO.getGroupId(),Constant.IS_DEL_NO);
     }
 

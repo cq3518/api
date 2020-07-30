@@ -56,4 +56,45 @@ public interface ApiInformationDetailUpdateRepository extends JpaRepository<ApiI
     @Transactional(rollbackOn = Exception.class)
     @Query(" update  ApiInformationDetailUpdatePO  set hangUpStatusCode=?2,modifiedAt=?3 ,apiChangeId=?4 where apiUpdateId=?1")
     void updateStatusByApiUpdateId(Long apiUpdateId, Long code, Date now, long changeId);
+
+    /**
+     *  获取api挂起信息
+     * @param groupIds 分组id
+     * @param code  挂起new 状态
+     * @param isDelYes 删除标识
+     * @return api 挂起信息
+     */
+    @Query("select po from ApiInformationDetailUpdatePO po where  po.groupId in (?1) and po.hangUpStatusCode =?2 " +
+            "and po.isDel=?3")
+    List<ApiInformationDetailUpdatePO> listByGroupId(List<Long> groupIds, Long code, Integer isDelYes);
+
+    /**
+     * 挂起的api信息
+     * @param apiId apiId
+     * @param code 挂起状态
+     * @param isDelYes 删除标识
+     * @return 挂起的api信息
+     */
+    @Query("select po from ApiInformationDetailUpdatePO po where  po.apiId = ?1 and po.hangUpStatusCode =?2 " +
+            "and po.isDel=?3")
+    ApiInformationDetailUpdatePO getByIdAndHangUpStatus(Long apiId, Long code, Integer isDelYes);
+
+    /**
+     * 挂起的api信息
+     * @param apiIds apiId
+     * @param code 挂起状态
+     * @param isDelYes 删除标识
+     * @return 挂起的api信息
+     */
+    @Query("select po from ApiInformationDetailUpdatePO po where  po.apiId in (?1) and po.hangUpStatusCode =?2 " +
+            "and po.isDel=?3")
+    List<ApiInformationDetailUpdatePO> ListByIdAndHangUpStatus(List<Long> apiIds, Long code, Integer isDelYes);
+
+    @Query("select po from ApiInformationDetailUpdatePO po where  po.apiUpdateId = ?1 and po.isDel =?2 ")
+    ApiInformationDetailUpdatePO getById(Long apiUpdateId, Integer isDelYes);
+
+    @Query("select po from ApiInformationDetailUpdatePO po where  po.groupId in (?1)  " +
+            "and po.isDel=?2")
+    List<ApiInformationDetailUpdatePO> listByGroupId(List<Long> groupId, Integer isDelYes);
+
 }

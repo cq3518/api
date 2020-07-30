@@ -4,12 +4,21 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateTime;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.winning.finance.apitool.base.BusinessException;
 import com.winning.finance.apitool.contant.Constant;
 import com.winning.finance.apitool.entity.*;
+import com.winning.finance.apitool.enumpack.ApiState;
 import com.winning.finance.apitool.enumpack.HangUpStatus;
+import com.winning.finance.apitool.enumpack.ParameterType;
 import com.winning.finance.apitool.repository.*;
+import com.winning.finance.apitool.util.ApiParamInfoUtil;
+import com.winning.finance.apitool.vo.apiinfo.checkout.CheckOutInfoInputVO;
+import com.winning.finance.apitool.vo.apiinfo.checkout.CheckOutInfoOutVO;
+import com.winning.finance.apitool.vo.apiinfo.info.InfoByGroupIdInputVO;
+import com.winning.finance.apitool.vo.apiinfo.info.InfoByGroupIdOutVO;
 import com.winning.finance.apitool.vo.apiinfo.save.SaveApiInfoInputVO;
+import com.winning.finance.apitool.vo.apiinfo.search.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -42,6 +51,9 @@ public class ApiInformationDetailServiceImpl {
 
     @Autowired
     private ApiParameterInformationRepository apiParameterInformationRepository;
+
+    @Autowired
+    private ApiParamInfoUtil apiParamInfoUtil;
 
     @Transactional(rollbackOn = Exception.class)
     public void save(SaveApiInfoInputVO inputVO) {
@@ -136,5 +148,135 @@ public class ApiInformationDetailServiceImpl {
             apiInformationDetailUpdateRepository.updateStatusByApiUpdateId(updatePO.getApiUpdateId(),HangUpStatus.CHECKING_IN.getCode(),
                     now,changeId);
         }
+    }
+
+    public List<InfoByGroupIdOutVO> apiInfoGroupIds(InfoByGroupIdInputVO inputVO) {
+        List<InfoByGroupIdOutVO> list=Lists.newArrayList();
+
+        List<ApiInformationDetailPO> apiInformationDetailPOS= apiInformationDetailRepository.listByGroupId(inputVO.getGroupIds(),Constant.IS_DEL_YES);
+        List<Long> apiIds=apiInformationDetailPOS.stream().map(e->e.getApiId()).collect(Collectors.toList());
+        Map<Long,ApiInformationDetailUpdatePO> map= Maps.newHashMap();
+        if(CollectionUtil.isNotEmpty(apiIds)){
+            List<ApiInformationDetailUpdatePO> detailUpdatePOS= apiInformationDetailUpdateRepository.ListByIdAndHangUpStatus(apiIds,HangUpStatus.CHECKING_OUT.getCode(),Constant.IS_DEL_YES);
+             map=detailUpdatePOS.stream().collect(Collectors.toMap(
+                    ApiInformationDetailUpdatePO::getApiId,o->o,(k1,k2)->k2 ));
+
+
+        }
+
+        for (ApiInformationDetailPO apiInformationDetailPO : apiInformationDetailPOS) {
+            InfoByGroupIdOutVO info=new InfoByGroupIdOutVO();
+            BeanUtil.copyProperties(apiInformationDetailPO,info);
+            ApiInformationDetailUpdatePO updatePO=map.get(apiInformationDetailPO.getApiId());
+            if(Objects.nonNull(updatePO)){
+                info.setApiUpdateId(updatePO.getApiUpdateId());
+            }
+            list.add(info);
+        }
+        List<ApiInformationDetailUpdatePO> apiInformationDetailUpdatePOS= apiInformationDetailUpdateRepository.listByGroupId(inputVO.getGroupIds(),HangUpStatus.NEW.getCode(),Constant.IS_DEL_YES);
+        for (ApiInformationDetailUpdatePO apiInformationDetailUpdatePO : apiInformationDetailUpdatePOS) {
+            InfoByGroupIdOutVO info=new InfoByGroupIdOutVO();
+            BeanUtil.copyProperties(apiInformationDetailUpdatePO,info);
+            list.add(info);
+        }
+        return list;
+    }
+
+    @Transactional(rollbackOn = Exception.class)
+    public CheckOutInfoOutVO checkOutApiInfo(CheckOutInfoInputVO inputVO) {
+
+        CheckOutInfoOutVO outInfoOutVO=new CheckOutInfoOutVO();
+        //1.根据入参【API标识】调用【Api-12】查询API信息，未查到则报错，如果查到的数据的【API状态代码】=【已废弃】则报错
+        ApiInformationDetailPO po= apiInformationDetailRepository.getByIdAndApiState(inputVO.getApiId(), ApiState.OBSOLETE.getCode(),Constant.IS_DEL_YES);
+        if(Objects.isNull(po)){
+          throw  new BusinessException("api标识【"+inputVO.getApiId()+"】未查到有效的api信息");
+        }
+        //2.根据【API标识】查询【挂起的API修改API_INFORMATION_DETAIL_UPDATE】的修改表【挂起状态代码】=【签出中】的数据，如果有则报错
+        ApiInformationDetailUpdatePO updatePO= apiInformationDetailUpdateRepository.getByIdAndHangUpStatus(inputVO.getApiId(),HangUpStatus.CHECKING_OUT.getCode(),Constant.IS_DEL_YES);
+        if(Objects.nonNull(updatePO)){
+            throw  new BusinessException("api标识【"+inputVO.getApiId()+"】已经在签出中了！");
+        }
+        ApiInformationDetailUpdatePO apiInformationDetailUpdatePO=new ApiInformationDetailUpdatePO();
+        BeanUtil.copyProperties(po,apiInformationDetailUpdatePO);
+        Long apiUpdateId=getSnowflakeId();
+        apiInformationDetailUpdatePO.setApiUpdateId(apiUpdateId);
+        apiInformationDetailUpdatePO.setHangUpStatusCode(HangUpStatus.CHECKING_OUT.getCode());
+        apiInformationDetailUpdatePO.setCreateBy(inputVO.getCheckOutBy());
+        apiInformationDetailUpdateRepository.save(apiInformationDetailUpdatePO);
+        //api参数插入
+        List<ApiParameterInformationPO> parameterInformationPOList= apiParameterInformationRepository.listByApiId(inputVO.getApiId());
+        for (ApiParameterInformationPO apiParameterInformationPO : parameterInformationPOList) {
+            ApiParameterInformationUpdatePO informationUpdatePO=new ApiParameterInformationUpdatePO();
+            BeanUtil.copyProperties(apiParameterInformationPO,informationUpdatePO);
+            informationUpdatePO.setApiUpdateId(apiUpdateId);
+            apiParameterInformationUpdateRepository.save(informationUpdatePO);
+        }
+
+        // 更新 ApiInformationDetailPO
+        apiInformationDetailRepository.updateById(inputVO.getApiId(),inputVO.getCheckOutBy(),DateTime.now());
+
+        outInfoOutVO.setApiUpdateId(apiUpdateId);
+        return outInfoOutVO;
+    }
+
+    public ApiInfoByIdOutVO searchApiInfo(ApiInfoByIdInputVO inputVO) {
+
+        ApiInfoByIdOutVO apiInfoByIdOutVO=new ApiInfoByIdOutVO();
+
+        ApiInformationDetailPO po= apiInformationDetailRepository.getById(inputVO.getApiId(),Constant.IS_DEL_YES);
+        if(Objects.isNull(po)){
+            throw  new BusinessException("api标识【"+inputVO.getApiId()+"】未查到有效的api信息");
+        }
+        //赋值到出参
+        BeanUtil.copyProperties(po,apiInfoByIdOutVO);
+        //查询参数
+        List<ApiParameterInformationPO> parameterInformationPOList= apiParameterInformationRepository.listByApiId(inputVO.getApiId());
+        //入参
+        List<ApiParameter> inputParameters=Lists.newArrayList();
+        //出参
+        List<ApiParameter> outParameters=Lists.newArrayList();
+        parameterInformationPOList.forEach(e->{
+
+            ApiParameter apiParameter=new ApiParameter();
+            BeanUtil.copyProperties(e,apiParameter);
+            if(Objects.equals(ParameterType.INPUT_PARAMETER.getCode(),e.getParameterTypeCode())){
+                inputParameters.add(apiParameter);
+            }else{
+                outParameters.add(apiParameter);
+            }
+        });
+        apiInfoByIdOutVO.setInputParameterList(apiParamInfoUtil.getApiParameter(inputParameters));
+        apiInfoByIdOutVO.setOutputParameterList(apiParamInfoUtil.getApiParameter(outParameters));
+
+        return apiInfoByIdOutVO;
+    }
+
+    public ApiInfoByApiUpdateIdOutVO searchApiInfoApiUpdateId(ApiInfoByApiUpdateIdInputVO inputVO) {
+
+        ApiInfoByApiUpdateIdOutVO outVO=new ApiInfoByApiUpdateIdOutVO();
+        ApiInformationDetailUpdatePO po= apiInformationDetailUpdateRepository.getById(inputVO.getApiUpdateId(),Constant.IS_DEL_YES);
+        if(Objects.isNull(po)){
+            throw  new BusinessException("api修改标识【"+inputVO.getApiUpdateId()+"】未查到有效的api信息");
+        }
+        BeanUtil.copyProperties(po,outVO);
+        //查询参数
+        List<ApiParameterInformationUpdatePO> parameterInformationPOList= apiParameterInformationUpdateRepository.listByApiUpdateId(Lists.newArrayList(inputVO.getApiUpdateId()));
+        //入参
+        List<ApiParameter> inputParameters=Lists.newArrayList();
+        //出参
+        List<ApiParameter> outParameters=Lists.newArrayList();
+        parameterInformationPOList.forEach(e->{
+
+            ApiParameter apiParameter=new ApiParameter();
+            BeanUtil.copyProperties(e,apiParameter);
+            if(Objects.equals(ParameterType.INPUT_PARAMETER.getCode(),e.getParameterTypeCode())){
+                inputParameters.add(apiParameter);
+            }else{
+                outParameters.add(apiParameter);
+            }
+        });
+        outVO.setInputParameterList(apiParamInfoUtil.getApiParameter(inputParameters));
+        outVO.setOutputParameterList(apiParamInfoUtil.getApiParameter(outParameters));
+        return outVO;
     }
 }

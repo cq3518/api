@@ -4,12 +4,20 @@ import com.winning.finance.apitool.base.ResponseResult;
 import com.winning.finance.apitool.contant.ApiPathConstant;
 import com.winning.finance.apitool.service.api.ApiInformationDetailServiceImpl;
 import com.winning.finance.apitool.service.api.ApiInformationDetailUpdateServiceImpl;
+import com.winning.finance.apitool.vo.apiinfo.checkout.CheckOutInfoInputVO;
+import com.winning.finance.apitool.vo.apiinfo.checkout.CheckOutInfoOutVO;
 import com.winning.finance.apitool.vo.apiinfo.delete.DeleteHangUpInputVO;
 import com.winning.finance.apitool.vo.apiinfo.edit.EditHangUpInputVO;
 import com.winning.finance.apitool.vo.apiinfo.edit.EditHangUpOutVO;
 import com.winning.finance.apitool.vo.apiinfo.hangup.NewHangUpInputVO;
 import com.winning.finance.apitool.vo.apiinfo.hangup.NewHangUpOutVO;
+import com.winning.finance.apitool.vo.apiinfo.info.InfoByGroupIdInputVO;
+import com.winning.finance.apitool.vo.apiinfo.info.InfoByGroupIdOutVO;
 import com.winning.finance.apitool.vo.apiinfo.save.SaveApiInfoInputVO;
+import com.winning.finance.apitool.vo.apiinfo.search.ApiInfoByApiUpdateIdInputVO;
+import com.winning.finance.apitool.vo.apiinfo.search.ApiInfoByApiUpdateIdOutVO;
+import com.winning.finance.apitool.vo.apiinfo.search.ApiInfoByIdInputVO;
+import com.winning.finance.apitool.vo.apiinfo.search.ApiInfoByIdOutVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * <p>api-tool</p>
@@ -69,5 +78,37 @@ public class InformationManagementController {
         apiInformationDetailService.save(inputVO);
         return ResponseResult.success(null);
     }
+
+    @ApiOperation(nickname = "根据分组标识列表查询API信息列表", value = "根据分组标识列表查询API信息列表")
+    @PostMapping(ApiPathConstant.API_INFO_GROUP_IDS)
+    public ResponseResult apiInfoGroupIds(@Valid @RequestBody InfoByGroupIdInputVO inputVO) {
+
+        List<InfoByGroupIdOutVO> outVO=apiInformationDetailService.apiInfoGroupIds(inputVO);
+        return ResponseResult.success(outVO);
+    }
+
+    @ApiOperation(nickname = "签出API信息以进行修改", value = "签出API信息以进行修改")
+    @PostMapping(ApiPathConstant.CHECK_OUT_API_INFO)
+    public ResponseResult checkOutApiInfo(@Valid @RequestBody CheckOutInfoInputVO inputVO) {
+
+        CheckOutInfoOutVO outVO=apiInformationDetailService.checkOutApiInfo(inputVO);
+        return ResponseResult.success(outVO);
+    }
+
+    @ApiOperation(nickname = "根据API标识查询API信息", value = "根据API标识查询API信息")
+    @PostMapping(ApiPathConstant.SEARCH_API_INFO)
+    public ResponseResult searchApiInfo(@Valid @RequestBody ApiInfoByIdInputVO inputVO) {
+
+        ApiInfoByIdOutVO outVO=apiInformationDetailService.searchApiInfo(inputVO);
+        return ResponseResult.success(outVO);
+    }
+    @ApiOperation(nickname = "根据签出API标识查询签出的API信息", value = "根据签出API标识查询签出的API信息")
+    @PostMapping(ApiPathConstant.SEARCH_API_INFO_API_UPDATE_ID)
+    public ResponseResult searchApiInfoApiUpdateId(@Valid @RequestBody ApiInfoByApiUpdateIdInputVO inputVO) {
+
+        ApiInfoByApiUpdateIdOutVO outVO=apiInformationDetailService.searchApiInfoApiUpdateId(inputVO);
+        return ResponseResult.success(outVO);
+    }
+
 
 }

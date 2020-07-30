@@ -11,6 +11,7 @@ import com.winning.finance.apitool.entity.ApiInformationDetailUpdatePO;
 import com.winning.finance.apitool.entity.ApiParameterInformationUpdatePO;
 import com.winning.finance.apitool.enumpack.HangUpStatus;
 import com.winning.finance.apitool.enumpack.ParameterType;
+import com.winning.finance.apitool.repository.ApiInformationDetailRepository;
 import com.winning.finance.apitool.repository.ApiInformationDetailUpdateRepository;
 import com.winning.finance.apitool.repository.ApiParameterInformationUpdateRepository;
 import com.winning.finance.apitool.vo.apiinfo.delete.DeleteHangUpInputVO;
@@ -45,6 +46,9 @@ public class ApiInformationDetailUpdateServiceImpl {
     private ApiInformationDetailUpdateRepository apiInformationDetailUpdateRepository;
 
     @Autowired
+    private ApiInformationDetailRepository apiInformationDetailRepository;
+
+    @Autowired
     private ApiParameterInformationUpdateRepository parameterInformationUpdateRepository;
 
 
@@ -52,7 +56,13 @@ public class ApiInformationDetailUpdateServiceImpl {
     public NewHangUpOutVO hangUp(NewHangUpInputVO inputVO) {
 
         NewHangUpOutVO outVO =new NewHangUpOutVO();
-        //todo 1.查询 API_INFORMATION_DETAIL，判断是否存在【API名称】或【API的URL】或 【api编码】相同的API，如果存在则报错。
+        // 1.查询 API_INFORMATION_DETAIL，判断是否存在【API名称】或【API的URL】或 【api编码】相同的API，如果存在则报错。
+        int count= apiInformationDetailRepository.countByApiInfo(inputVO.getApiName(),inputVO.getApiUrl(),inputVO.getApiNo());
+        if(count>0){
+            throw  new BusinessException("存在【API名称】:"+inputVO.getApiName()+"或【API的URL】:"+inputVO.getApiUrl()+
+                    "或 【api编码】:"+inputVO.getApiNo()+"相同的API");
+        }
+
         ApiInformationDetailUpdatePO po=new ApiInformationDetailUpdatePO();
         //api修改标识
         long apiUpdateId = getSnowflakeId();
