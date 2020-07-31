@@ -31,9 +31,6 @@ public class NewHangUpInputVO {
     @ApiModelProperty(value = "API的URL",required = true,position = 30)
     private String apiUrl;
 
-    @NotBlank(message = "API编号不为空")
-    @ApiModelProperty(value = "API编号",required = true,position = 30)
-    private String apiNo;
 
     @NotNull(message = "API状态代码不为空")
     @ApiModelProperty(value = "API状态代码",required = true,position = 40)

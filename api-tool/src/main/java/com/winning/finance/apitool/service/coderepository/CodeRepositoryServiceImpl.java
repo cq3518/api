@@ -26,6 +26,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import static com.winning.finance.apitool.base.IdWorker.getSnowflakeId;
 
@@ -70,7 +71,9 @@ public class CodeRepositoryServiceImpl implements CodeRepositoryService {
             throw  new BusinessException("已存在【仓库名称】或【服务appId】或【APP名称】相同的代码仓库");
         }
 
+
     }
+
 
     @Override
     public QueryAllOutVO searchBusinessDomain() {

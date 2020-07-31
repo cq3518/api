@@ -65,4 +65,13 @@ public interface CodeRepositoryGroupRepository extends JpaRepository<CodeReposit
      */
     @Query("select  po from CodeRepositoryGroupPO po where po.codeRepositoryId=?1 and po.isDel=?2 ")
     List<CodeRepositoryGroupPO> listByCodeRepositoryId(Long codeRepositoryId,Integer isDel);
+
+    /**
+     * 通过分组标识查询当前所属仓库
+     * @param groupId 分组标识
+     * @param isDelYes 删除标识
+     * @return 所属仓库
+     */
+    @Query("select  po.codeRepositoryId from CodeRepositoryGroupPO po where po.groupId=?1 and po.isDel=?2")
+    Long getCodeRepositoryIdById(Long groupId, Integer isDelYes);
 }

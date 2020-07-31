@@ -9,11 +9,10 @@ import com.winning.finance.apitool.base.BusinessException;
 import com.winning.finance.apitool.contant.Constant;
 import com.winning.finance.apitool.entity.ApiInformationDetailUpdatePO;
 import com.winning.finance.apitool.entity.ApiParameterInformationUpdatePO;
+import com.winning.finance.apitool.entity.CodeRepositoryInformationPO;
 import com.winning.finance.apitool.enumpack.HangUpStatus;
 import com.winning.finance.apitool.enumpack.ParameterType;
-import com.winning.finance.apitool.repository.ApiInformationDetailRepository;
-import com.winning.finance.apitool.repository.ApiInformationDetailUpdateRepository;
-import com.winning.finance.apitool.repository.ApiParameterInformationUpdateRepository;
+import com.winning.finance.apitool.repository.*;
 import com.winning.finance.apitool.vo.apiinfo.delete.DeleteHangUpInputVO;
 import com.winning.finance.apitool.vo.apiinfo.edit.EditHangUpInputVO;
 import com.winning.finance.apitool.vo.apiinfo.edit.EditHangUpOutVO;
@@ -24,8 +23,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -51,17 +52,25 @@ public class ApiInformationDetailUpdateServiceImpl {
     @Autowired
     private ApiParameterInformationUpdateRepository parameterInformationUpdateRepository;
 
+    @Autowired
+    private CodeRepositoryGroupRepository codeRepositoryGroupRepository;
+    @Autowired
+    private CodeRepositoryInformationRepository codeRepositoryInformationRepository;
+
 
     @Transactional(rollbackOn = Exception.class)
     public NewHangUpOutVO hangUp(NewHangUpInputVO inputVO) {
 
         NewHangUpOutVO outVO =new NewHangUpOutVO();
-        // 1.查询 API_INFORMATION_DETAIL，判断是否存在【API名称】或【API的URL】或 【api编码】相同的API，如果存在则报错。
-        int count= apiInformationDetailRepository.countByApiInfo(inputVO.getApiName(),inputVO.getApiUrl(),inputVO.getApiNo());
+        // 1.查询 API_INFORMATION_DETAIL，判断是否存在【API名称】或【API的URL】，如果存在则报错。
+        int count= apiInformationDetailRepository.countByApiInfo(inputVO.getApiName(),inputVO.getApiUrl());
         if(count>0){
-            throw  new BusinessException("存在【API名称】:"+inputVO.getApiName()+"或【API的URL】:"+inputVO.getApiUrl()+
-                    "或 【api编码】:"+inputVO.getApiNo()+"相同的API");
+            throw  new BusinessException("存在【API名称】:"+inputVO.getApiName()+"或【API的URL】:"+inputVO.getApiUrl()
+                    );
         }
+        CodeRepositoryInformationPO codeRepositoryInformationPO = getCodeRepositoryInformationPO(inputVO);
+        //组装apiNo
+        String apiNo= codeRepositoryInformationPO.getAppId()+Constant.STRING_CONNECT+codeRepositoryInformationPO.getCurrApiNo()+Constant.STRING_CONNECT+Constant.API_NO_VERSION;
 
         ApiInformationDetailUpdatePO po=new ApiInformationDetailUpdatePO();
         //api修改标识
@@ -72,6 +81,7 @@ public class ApiInformationDetailUpdateServiceImpl {
         Date now=DateTime.now();
         po.setCreateAt(now);
         po.setModifiedAt(now);
+        po.setApiNo(apiNo);
         po.setHangUpStatusCode(HangUpStatus.NEW.getCode());
         apiInformationDetailUpdateRepository.save(po);
 
@@ -81,7 +91,32 @@ public class ApiInformationDetailUpdateServiceImpl {
         saveParameter(apiUpdateId, inputVO.getOutputParameterList(),0L, ParameterType.OUT_PARAMETER.getCode());
 
         outVO.setApiUpdateId(apiUpdateId);
+
+        // 更新 仓库表中的 currApiNo+1
+        String currApiNo=codeRepositoryInformationPO.getCurrApiNo();
+
+        int currApiNoInt=(new BigDecimal(currApiNo).add(new BigDecimal(1)) ).intValue();
+        //不够四位 补零
+        String currApiNoUpdate = String.format("%4d", currApiNoInt).replace(" ", "0");
+        // 更新 仓库的当前api编号
+        codeRepositoryInformationRepository.updateApiNoById(codeRepositoryInformationPO.getCodeRepositoryId(),currApiNoUpdate);
+
         return outVO;
+    }
+
+    private CodeRepositoryInformationPO getCodeRepositoryInformationPO(NewHangUpInputVO inputVO) {
+        // 自动生成api编号
+        //通过 分组id 查询当前所属 仓库
+        Long codeRepositoryId= codeRepositoryGroupRepository.getCodeRepositoryIdById(inputVO.getGroupId(), Constant.IS_DEL_YES);
+        if(Objects.isNull(codeRepositoryId)){
+            throw new BusinessException("当前分组没有所属仓库！");
+        }
+        // 根据仓库获取当前api编号
+        Optional<CodeRepositoryInformationPO> optional=codeRepositoryInformationRepository.findById(codeRepositoryId);
+        if(!optional.isPresent()){
+            throw new BusinessException("当前仓库标识【"+codeRepositoryId+"】未查到仓库信息");
+        }
+        return optional.get();
     }
 
     /**

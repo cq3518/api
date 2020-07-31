@@ -2,9 +2,11 @@ package com.winning.finance.apitool.repository;
 
 import com.winning.finance.apitool.entity.CodeRepositoryInformationPO;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import javax.transaction.Transactional;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -44,4 +46,9 @@ public interface CodeRepositoryInformationRepository extends JpaRepository<CodeR
      */
     @Query("select po  from CodeRepositoryInformationPO po where po.businessDomainId =?1 ")
     List<CodeRepositoryInformationPO> listByBusinessDomainId(Long businessDomainId);
+
+    @Modifying
+    @Transactional(rollbackOn = Exception.class)
+    @Query(" update   CodeRepositoryInformationPO set currApiNo=?2 where codeRepositoryId=?1")
+    void updateApiNoById(Long codeRepositoryId, String currApiNoUpdate);
 }

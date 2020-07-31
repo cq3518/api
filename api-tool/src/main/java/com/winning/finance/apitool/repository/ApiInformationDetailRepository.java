@@ -65,6 +65,6 @@ public interface ApiInformationDetailRepository extends JpaRepository<ApiInforma
 
     @Query("select count(1) from ApiInformationDetailPO po " +
             "where po.apiName=?1 or " +
-            "po.apiUrl=?2 or po.apiNo=?3")
-    Integer countByApiInfo(String apiName, String apiUrl, String apiNo);
+            "po.apiUrl=?2 ")
+    Integer countByApiInfo(String apiName, String apiUrl);
 }

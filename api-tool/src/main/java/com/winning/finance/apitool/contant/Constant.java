@@ -17,4 +17,10 @@ public class Constant {
      * 删除标识 1 删除
      */
     public  static final Integer IS_DEL_NO=1;
+
+    /**
+     * "-"
+     */
+    public  static final String STRING_CONNECT="-";
+    public  static final String API_NO_VERSION="01";
 }

@@ -6,6 +6,7 @@ import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.math.BigInteger;
 
 /**
@@ -62,6 +63,7 @@ public class AddInputVO {
 
     @ApiModelProperty(value = "当前API编号",required = true,position = 120)
     @NotBlank(message = "当前API编号不能空")
+    @Pattern(regexp="^[0-9]*$",message = "api编号需要是数字类型的字符串")
     private String currApiNo;
 
     @ApiModelProperty(value = "业务域标识",required = true,position = 130)
