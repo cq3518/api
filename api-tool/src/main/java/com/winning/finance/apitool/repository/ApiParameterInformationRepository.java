@@ -26,4 +26,11 @@ public interface ApiParameterInformationRepository extends JpaRepository<ApiPara
      */
     @Query("select  po from ApiParameterInformationPO po where po.apiId = ?1")
     List<ApiParameterInformationPO> listByApiId(Long apiId);
+    /**
+     * API的参数信息
+     * @param apiIds apiIds
+     * @return API的参数信息
+     */
+    @Query("select  po from ApiParameterInformationPO po where po.apiId in (?1) ")
+    List<ApiParameterInformationPO> listByApiIds(List<Long> apiIds);
 }

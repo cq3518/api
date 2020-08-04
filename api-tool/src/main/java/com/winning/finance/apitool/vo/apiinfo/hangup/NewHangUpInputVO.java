@@ -63,5 +63,5 @@ public class NewHangUpInputVO {
     private List<ParameterVO> inputParameterList;
 
     @ApiModelProperty(value = "API的出参列表",position = 120)
-    private List<ParameterVO> OutputParameterList;
+    private List<ParameterVO> outputParameterList;
 }

@@ -105,7 +105,7 @@ public class ApiInformationDetailServiceImpl {
                 .collect(Collectors.groupingBy(ApiParameterInformationUpdatePO::getApiUpdateId));
 
         for (ApiInformationDetailUpdatePO updatePO : apiInformationDetailUpdatePOS) {
-            if (Objects.nonNull(updatePO.getApiId())){
+            if (Objects.isNull(updatePO.getApiId())){
                 //插入
                 ApiInformationDetailPO  detailPO=new ApiInformationDetailPO();
                 BeanUtil.copyProperties(updatePO, detailPO);
@@ -235,16 +235,19 @@ public class ApiInformationDetailServiceImpl {
         List<ApiParameter> inputParameters=Lists.newArrayList();
         //出参
         List<ApiParameter> outParameters=Lists.newArrayList();
-        parameterInformationPOList.forEach(e->{
+        if(CollectionUtil.isNotEmpty(parameterInformationPOList)){
 
-            ApiParameter apiParameter=new ApiParameter();
-            BeanUtil.copyProperties(e,apiParameter);
-            if(Objects.equals(ParameterType.INPUT_PARAMETER.getCode(),e.getParameterTypeCode())){
-                inputParameters.add(apiParameter);
-            }else{
-                outParameters.add(apiParameter);
-            }
-        });
+            parameterInformationPOList.forEach(e->{
+
+                ApiParameter apiParameter=new ApiParameter();
+                BeanUtil.copyProperties(e,apiParameter);
+                if(Objects.equals(ParameterType.INPUT_PARAMETER.getCode(),e.getParameterTypeCode())){
+                    inputParameters.add(apiParameter);
+                }else{
+                    outParameters.add(apiParameter);
+                }
+            });
+        }
         apiInfoByIdOutVO.setInputParameterList(apiParamInfoUtil.getApiParameter(inputParameters));
         apiInfoByIdOutVO.setOutputParameterList(apiParamInfoUtil.getApiParameter(outParameters));
 
@@ -265,16 +268,19 @@ public class ApiInformationDetailServiceImpl {
         List<ApiParameter> inputParameters=Lists.newArrayList();
         //出参
         List<ApiParameter> outParameters=Lists.newArrayList();
-        parameterInformationPOList.forEach(e->{
+        if(CollectionUtil.isNotEmpty(parameterInformationPOList)){
 
-            ApiParameter apiParameter=new ApiParameter();
-            BeanUtil.copyProperties(e,apiParameter);
-            if(Objects.equals(ParameterType.INPUT_PARAMETER.getCode(),e.getParameterTypeCode())){
-                inputParameters.add(apiParameter);
-            }else{
-                outParameters.add(apiParameter);
-            }
-        });
+            parameterInformationPOList.forEach(e->{
+
+                ApiParameter apiParameter=new ApiParameter();
+                BeanUtil.copyProperties(e,apiParameter);
+                if(Objects.equals(ParameterType.INPUT_PARAMETER.getCode(),e.getParameterTypeCode())){
+                    inputParameters.add(apiParameter);
+                }else{
+                    outParameters.add(apiParameter);
+                }
+            });
+        }
         outVO.setInputParameterList(apiParamInfoUtil.getApiParameter(inputParameters));
         outVO.setOutputParameterList(apiParamInfoUtil.getApiParameter(outParameters));
         return outVO;
