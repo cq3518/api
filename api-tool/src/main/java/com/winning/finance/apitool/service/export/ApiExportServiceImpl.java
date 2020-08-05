@@ -8,12 +8,14 @@ import com.winning.finance.apitool.contant.Constant;
 import com.winning.finance.apitool.entity.ApiInformationDetailPO;
 import com.winning.finance.apitool.entity.ApiParameterInformationPO;
 import com.winning.finance.apitool.entity.CodeRepositoryGroupPO;
+import com.winning.finance.apitool.entity.CodeRepositoryInformationPO;
 import com.winning.finance.apitool.enumpack.DataTypeCode;
 import com.winning.finance.apitool.enumpack.ParameterType;
 import com.winning.finance.apitool.enumpack.RequestMethodCode;
 import com.winning.finance.apitool.repository.ApiInformationDetailRepository;
 import com.winning.finance.apitool.repository.ApiParameterInformationRepository;
 import com.winning.finance.apitool.repository.CodeRepositoryGroupRepository;
+import com.winning.finance.apitool.repository.CodeRepositoryInformationRepository;
 import com.winning.finance.apitool.util.ExportApiParamInfoUtil;
 import com.winning.finance.apitool.vo.export.CodeRepositoryIdOutVO;
 import com.winning.finance.apitool.vo.export.ExportApiParameter;
@@ -23,6 +25,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -45,6 +48,8 @@ public class ApiExportServiceImpl {
 
     @Autowired
     private ExportApiParamInfoUtil exportApiParamInfoUtil;
+    @Autowired
+    private CodeRepositoryInformationRepository codeRepositoryInformationRepository;
 
 
     public List<CodeRepositoryIdOutVO> exportByCodeRepositoryId(Long codeRepositoryId) {
@@ -90,15 +95,11 @@ public class ApiExportServiceImpl {
                 //出参
                 List<ExportApiParameter> outParameters=Lists.newArrayList();
 
-                // 入参
-                List<ApiParameterInformationPO> inputParameter=  apiParameterInformationPOS.stream().filter(e->Objects.equals(e.getParameterTypeCode()
-                , ParameterType.INPUT_PARAMETER.getCode())).collect(Collectors.toList());
-
-                for (ApiParameterInformationPO apiParameterInformationPO : inputParameter) {
+                for (ApiParameterInformationPO apiParameterInformationPO : apiParameterInformationPOS) {
+                    ExportApiParameter exportApiParameter=new ExportApiParameter();
+                    BeanUtil.copyProperties(apiParameterInformationPO, exportApiParameter);
                     if(Objects.equals(apiParameterInformationPO.getParameterTypeCode(), ParameterType.INPUT_PARAMETER.getCode())){
                         //入参
-                        ExportApiParameter exportApiParameter=new ExportApiParameter();
-                        BeanUtil.copyProperties(apiParameterInformationPO, exportApiParameter);
                         if(Objects.equals(41L,exportApiParameter.getRequiredCode())){
                             exportApiParameter.setRequiredCodeName("Y");
                         }else{
@@ -108,9 +109,7 @@ public class ApiExportServiceImpl {
                         exportApiParameter.setDataTypeCodeName(dataTypeCode.getName());
                         inputParameters.add(exportApiParameter);
                     }else{
-                        //入参
-                        ExportApiParameter exportApiParameter=new ExportApiParameter();
-                        BeanUtil.copyProperties(apiParameterInformationPO,exportApiParameter);
+                        //出参
                         if(Objects.equals(41L,exportApiParameter.getRequiredCode())){
                             exportApiParameter.setRequiredCodeName("Y");
                         }else{
@@ -141,5 +140,14 @@ public class ApiExportServiceImpl {
 
         return  CodeRepositoryIdOutVOs;
 
+    }
+
+    public String repositoryNameById(Long codeRepositoryId) {
+
+       Optional<CodeRepositoryInformationPO> optional= codeRepositoryInformationRepository.findById(codeRepositoryId);
+       if (!optional.isPresent()){
+           throw  new BusinessException("未查到代码标识【"+codeRepositoryId+"】：代码仓库");
+       }
+       return optional.get().getRepositoryName();
     }
 }
