@@ -170,6 +170,7 @@ public class ApiInformationDetailServiceImpl {
             ApiInformationDetailUpdatePO updatePO=map.get(apiInformationDetailPO.getApiId());
             if(Objects.nonNull(updatePO)){
                 info.setApiUpdateId(updatePO.getApiUpdateId());
+                info.setHangUpStatusCode(updatePO.getHangUpStatusCode());
             }
             list.add(info);
         }
