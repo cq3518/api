@@ -1,10 +1,8 @@
 package com.winning.finance.apitool.vo.export;
 
-import com.winning.finance.apitool.enumpack.DataTypeCode;
 import lombok.Data;
 
 import java.util.List;
-import java.util.Objects;
 
 /**
  * <p>api-tool</p>

@@ -1,6 +1,5 @@
 package com.winning.finance.apitool.repository;
 
-import com.winning.finance.apitool.entity.ApiInformationDetailPO;
 import com.winning.finance.apitool.entity.ApiParameterInformationUpdatePO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;

@@ -26,7 +26,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.regex.Pattern;
 
 import static com.winning.finance.apitool.base.IdWorker.getSnowflakeId;
 

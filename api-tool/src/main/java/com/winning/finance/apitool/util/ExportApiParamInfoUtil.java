@@ -6,7 +6,6 @@ import com.google.common.collect.Lists;
 import com.winning.finance.apitool.vo.export.ExportApiParameter;
 import org.springframework.stereotype.Component;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
