@@ -23,4 +23,5 @@ public class Constant {
      */
     public  static final String STRING_CONNECT="-";
     public  static final String API_NO_VERSION="01";
+    public  static final String STRING_ZERO="0";
 }

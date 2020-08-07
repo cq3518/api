@@ -171,6 +171,7 @@ public class ApiInformationDetailUpdateServiceImpl {
         po.setApiChangeId(oldPo.getApiChangeId());
         po.setGroupId(oldPo.getGroupId());
         po.setApiNo(oldPo.getApiNo());
+        po.setApiId(oldPo.getApiId());
         po.setCreateAt(oldPo.getCreateAt());
         po.setModifiedAt(DateTime.now());
         if(StrUtil.isBlank(inputVO.getMemo())){

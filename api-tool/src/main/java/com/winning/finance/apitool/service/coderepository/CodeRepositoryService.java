@@ -5,6 +5,8 @@ import com.winning.finance.apitool.vo.coderepository.add.AddOutVO;
 import com.winning.finance.apitool.vo.coderepository.domain.QueryAllOutVO;
 import com.winning.finance.apitool.vo.coderepository.edit.EditInputVO;
 import com.winning.finance.apitool.vo.coderepository.edit.EditOutVO;
+import com.winning.finance.apitool.vo.coderepository.getappid.AppIdByDomainIdInputVO;
+import com.winning.finance.apitool.vo.coderepository.getappid.AppIdByDomainIdOutVO;
 import com.winning.finance.apitool.vo.coderepository.search.SearchByIdInputVO;
 import com.winning.finance.apitool.vo.coderepository.search.SearchByIdOutVO;
 
@@ -42,4 +44,11 @@ public interface CodeRepositoryService {
      * @return 根据业务域编码查询代码仓库信息
      */
     SearchByIdOutVO search(SearchByIdInputVO inputVO);
+
+    /**
+     * 根据业务域标识、架构类别代码获取当前可用的appId
+     * @param inputVO 入参
+     * @return 根据业务域标识、架构类别代码获取当前可用的appId
+     */
+    AppIdByDomainIdOutVO appIdByDomainIdRepositoryArchitectTypeCode(AppIdByDomainIdInputVO inputVO);
 }

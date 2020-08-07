@@ -89,4 +89,9 @@ public class ApiPathConstant {
      * 3.3.7 根据签出API标识查询签出的API信息---new
      */
     public static final String SEARCH_API_INFO_API_UPDATE_ID=PRE+"/apiInformation/searchApiInfoByUpdate";
+
+    /**
+     * 根据业务域标识、架构类别代码获取当前可用的appId
+     */
+    public static final String APP_ID_BY_DOMAIN_ID_REPOSITORY_ARCHITECT_TYPE_CODE=PRE+"/codeRepositoryInformation/appIdByDomainId";
 }

@@ -17,7 +17,7 @@ import java.util.Date;
 @Table(name="API_INFORMATION_DETAIL")
 public class ApiInformationDetailPO {
     /**
-     * API标识
+     * API标识apiId
      */
     @Id
     @Column(name = "API_ID")

@@ -51,4 +51,8 @@ public interface CodeRepositoryInformationRepository extends JpaRepository<CodeR
     @Transactional(rollbackOn = Exception.class)
     @Query(" update   CodeRepositoryInformationPO set currApiNo=?2 where codeRepositoryId=?1")
     void updateApiNoById(Long codeRepositoryId, String currApiNoUpdate);
+
+
+    @Query("select po  from CodeRepositoryInformationPO po where po.appId like '%?1%' order by appId desc ")
+    List<CodeRepositoryInformationPO> listbyAppId(String appId);
 }

@@ -8,6 +8,8 @@ import com.winning.finance.apitool.vo.coderepository.add.AddOutVO;
 import com.winning.finance.apitool.vo.coderepository.domain.QueryAllOutVO;
 import com.winning.finance.apitool.vo.coderepository.edit.EditInputVO;
 import com.winning.finance.apitool.vo.coderepository.edit.EditOutVO;
+import com.winning.finance.apitool.vo.coderepository.getappid.AppIdByDomainIdInputVO;
+import com.winning.finance.apitool.vo.coderepository.getappid.AppIdByDomainIdOutVO;
 import com.winning.finance.apitool.vo.coderepository.search.SearchByIdInputVO;
 import com.winning.finance.apitool.vo.coderepository.search.SearchByIdOutVO;
 import io.swagger.annotations.Api;
@@ -71,4 +73,14 @@ public class CodeRepositoryInformationController {
 
         return ResponseResult.success(outVO);
     }
+    @ApiOperation(nickname = "根据业务域标识、架构类别代码获取当前可用的appId", value = "根据业务域标识、架构类别代码获取当前可用的appId")
+    @PostMapping(ApiPathConstant.APP_ID_BY_DOMAIN_ID_REPOSITORY_ARCHITECT_TYPE_CODE)
+    public ResponseResult appIdByDomainIdRepositoryArchitectTypeCode(@Valid @RequestBody AppIdByDomainIdInputVO inputVO) {
+
+        AppIdByDomainIdOutVO outVO=codeRepositoryService.appIdByDomainIdRepositoryArchitectTypeCode(inputVO);
+
+        return ResponseResult.success(outVO);
+    }
+
+
 }
